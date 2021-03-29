@@ -1,0 +1,43 @@
+
+
+Vagrant.configure("2") do |config|
+
+        config.vm.provision "shell", path: "bootstrap.sh"
+
+        config.vm.define "Kmaster1" do |masternode|
+            masternode.vm.provider "hyperv"
+            masternode.vm.box = "bento/ubuntu-20.04"
+            masternode.vm.network "public_network", auto_config: false
+            masternode.vm.provider "hyperv" do |h|
+                h.enable_virtualization_extensions = true
+                h.linked_clone = true
+                h.cpus = 2
+                h.maxmemory = 2048
+                h.memory = 2048
+                h.vmname = "Kmaster1"
+                end
+            config.vm.synced_folder '.', '/vagrant', disabled: true
+        end
+
+    NodeCount = 2
+
+  # Kubernetes Worker Nodes
+  	(1..NodeCount).each do |i|
+    	config.vm.define "kworker#{i}" do |workernode|
+      		workernode.vm.box = "bento/ubuntu-20.04"
+     		workernode.vm.hostname = "kworker#{i}.example.com"
+     		workernode.vm.network "public_network", auto_config: false
+     		workernode.vm.provider "hyperv" do |h|
+                h.enable_virtualization_extensions = true
+                h.linked_clone = true
+                h.cpus = 1
+                h.maxmemory = 1024
+                h.memory = 1024
+                h.vmname = "KWorker#{i}"
+       			
+      		end
+      	config.vm.synced_folder '.', '/vagrant', disabled: true
+    	end
+  	end
+end
+    
