@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+Vagrant.configure(2) do |config|
+
+  config.vm.provision "shell", path: "bootstrap.sh"
+
+  NodeCount = 2
+
+  (1..NodeCount).each do |i|
+    config.vm.define "debian11vm0#{i}" do |node|
+      node.vm.box = "bento/ubuntu-20.04"
+      node.vm.hostname = "debian11vm0#{i}.b0x.it"
+      node.vm.network "private_network", ip: "172.8.8.10#{i}"
+
+      node.vm.provider "virtualbox" do |v|
+        v.name = "debian11-0#{i}"
+        v.memory = 2048
+        v.cpus = 1
+      end
+    end
+  end
+
+end
